@@ -81,6 +81,17 @@ _This project is dedicated to them as a memory of our collaboration._
 This project is licensed under the **MIT License** – see the `LICENSE` file for details.
 
 ---
+## ⚠️ License
+
+This project is **not** open-source.  
+Copying, redistributing, or modifying any part of this code without **explicit permission** is strictly prohibited.
+All rights reserved © 2025 Yalda.
+
+
+
+
+
+---
 
 <p align="center">
   <img src="https://readme-typing-svg.demolab.com?font=Fira+Code&duration=4000&pause=500&color=00F7FF&center=true&repeat=false&width=600&lines=Thanks+for+checking+out+my+project!+⭐" alt="Typing SVG" />
