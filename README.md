@@ -1,7 +1,7 @@
 # 🤖 Smart Trading Bot
 
-![Status](https://img.shields.io/badge/status-active-brightgreen)
-![License](https://img.shields.io/badge/license-MIT-blue)
+![Status](https://img.shields.io/badge/status-active-brightgreen)  
+![License](https://img.shields.io/badge/license-MIT-blue)  
 ![Language](https://img.shields.io/badge/language-Python-orange)
 
 ---
@@ -35,16 +35,14 @@ The bot supports easy configuration, modular design, and logging features.
 
 ## 📁 Project Structure
 
+```
 /trading-bot
-├── bot.py # Main trading bot script
-├── config.py # Configuration variables (thresholds, API keys)
-├── strategies.py # Trading strategies module
-├── logs/ # Folder to store logs
-└── README.md # This file
-
-yaml
-Copy
-Edit
+├── bot.py               # Main trading bot script
+├── config.py            # Configuration variables (thresholds, API keys)
+├── strategies.py        # Trading strategies module
+├── logs/                # Folder to store logs
+└── README.md            # This file
+```
 
 ---
 
@@ -60,30 +58,30 @@ Edit
 
 ## ⚙️ Installation & Usage
 
-1. Clone the repo:  
 ```bash
 git clone https://github.com/yourusername/trading-bot.git
 cd trading-bot
-Install dependencies:
-
-bash
-Copy
-Edit
 pip install -r requirements.txt
-Configure parameters in config.py.
-
-Run the bot:
-
-bash
-Copy
-Edit
 python bot.py
-🙏 Acknowledgments
-Special thanks to Hosein for his invaluable support and assistance.
-Also, a big thank you to my mentor for continuous guidance.
+```
 
-This project is dedicated to them as a memory of our collaboration.
+---
 
-📜 License
-This project is licensed under the MIT License - see the LICENSE file for details.
+## 🙏 Acknowledgments
 
+Special thanks to **Hosein** for his invaluable support and assistance.  
+Also, a big thank you to my **mentor** for continuous guidance.  
+
+_This project is dedicated to them as a memory of our collaboration._
+
+---
+
+## 📜 License
+
+This project is licensed under the **MIT License** – see the `LICENSE` file for details.
+
+---
+
+<p align="center">
+  <img src="https://readme-typing-svg.demolab.com?font=Fira+Code&duration=4000&pause=500&color=00F7FF&center=true&repeat=false&width=600&lines=Thanks+for+checking+out+my+project!+⭐" alt="Typing SVG" />
+</p>
