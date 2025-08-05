@@ -1,0 +1,376 @@
+// This source code is subject to the terms of the Mozilla Public License 2.0 at https://mozilla.org/MPL/2.0
+//CodedBy=@Sunyaldaraz
+//@version=5
+strategy("BOT Strategy", overlay=true,initial_capital = 1000 , default_qty_type = strategy.cash ,currency=currency.USDT,default_qty_value=300, max_bars_back=1000 , max_lines_count = 500)
+
+
+
+//
+ATR = input (title = "ATR/SL" ,defval=false)
+length = input.int(title="Length", defval=14, minval=1)
+smoothing = input.string(title="Smoothing", defval="RMA", options=["RMA", "SMA", "EMA", "WMA"])
+ma_function(source, length) =>
+	switch smoothing
+		"RMA" => ta.rma(source, length)
+		"SMA" => ta.sma(source, length)
+		"EMA" => ta.ema(source, length)
+		=> ta.wma(source, length)
+ma_f = ma_function(ta.tr(true), length)
+plot(ma_f, title = "ATR", color=color.new(#B71C1C, 0))
+
+string tfInput = input.timeframe("4h", "Timeframe")
+//
+
+
+//
+
+
+//
+
+
+
+// ------------------------------------------- ATR ---------------------------------------------------
+color i_TriggerBGColor =color.green //input(defval = color.green, title = "Trigger Time Background Color")
+color i_TriggerTxtColor =color.black //input(defval = color.black,title = "Trigger Time Text Color")
+
+color i_TradingBGColor =color.blue //input(defval = color.blue,title = "Trading Time Background Color")
+color i_TradingTxtColor =color.white //input(defval = color.white,title = "Trading Time Text Color")
+
+color i_OtherBGColor =color.gray //input(defval = color.gray,title = "Other Time Background Color")
+color i_OtherTxtColor =color.white //input(defval = color.white,title = "Other Time Text Color")
+
+color i_OtherwBGColor =color.orange //input(defval = color.gray,title = "Other Time Background Color")
+color i_OtherwTxtColor =color.black //input(defval = color.white,title = "Other Time Text Color")
+
+i_decimal =input(defval = 2, title = "Decimal points")
+
+var table atrDisplay = table.new(position.top_right, 3, 4, bgcolor = color.gray, frame_width = 2, frame_color = color.black)
+// We call `ta.atr()` outside the `if` block so it executes on each bar.
+
+atr5 = request.security(syminfo.tickerid, '5', ta.rma(ta.tr(true),14))
+atr15 = request.security(syminfo.tickerid, '15', ta.rma(ta.tr(true),14))
+atr1h = request.security(syminfo.tickerid, '60', ta.rma(ta.tr(true),14))
+atr4h = request.security(syminfo.tickerid, '240', ta.rma(ta.tr(true),14))
+atrD = request.security(syminfo.tickerid, '1D',ta.rma(ta.tr(true),14))
+atrW = request.security(syminfo.tickerid, '1W', ta.rma(ta.tr(true),14))
+
+
+if barstate.islast
+
+    ATRformatStructure = '#.'
+
+    for i = 1 to i_decimal
+        ATRformatStructure += '0'
+    
+
+    color BGColor5 = i_OtherBGColor
+    color BGColor15 = i_OtherBGColor
+    color BGColor1h = i_OtherBGColor
+    color BGColor4h = i_OtherBGColor
+    color BGColor1D = i_OtherBGColor
+    color BGColor1W = i_OtherwBGColor
+    
+    color TxtColor5 = i_OtherTxtColor
+    color TxtColor15 = i_OtherTxtColor
+    color TxtColor1h = i_OtherTxtColor
+    color TxtColor4h = i_OtherTxtColor
+    color TxtColor1D = i_OtherTxtColor
+    color TxtColor1W = i_OtherwTxtColor
+
+
+    switch timeframe.period
+        "5" => 
+            BGColor5 := i_TriggerBGColor
+            TxtColor5 := i_TriggerTxtColor
+                
+            BGColor1h := i_TradingBGColor
+            TxtColor1h := i_TradingTxtColor
+                   
+                
+        "15" => 
+            BGColor15 := i_TriggerBGColor
+            TxtColor15 := i_TriggerTxtColor
+                
+            BGColor4h := i_TradingBGColor
+            TxtColor4h := i_TradingTxtColor
+           
+                
+        "60" => 
+            BGColor1h := i_TriggerBGColor
+            TxtColor1h := i_TriggerTxtColor
+            
+            BGColor1D := i_TradingBGColor
+            TxtColor1D := i_TradingTxtColor        
+            
+            
+        "240" =>    
+            BGColor4h := i_TriggerBGColor
+            TxtColor4h := i_TriggerTxtColor
+            
+            BGColor1W := i_TradingBGColor
+            TxtColor1W := i_TradingTxtColor
+            
+        "D" =>  
+            BGColor1D := i_TriggerBGColor
+            TxtColor1D := i_TriggerTxtColor
+            
+            BGColor1W := i_TradingBGColor
+            TxtColor1W := i_TradingTxtColor
+    
+        "W" =>  
+            BGColor1W := i_TriggerBGColor
+            TxtColor1W := i_TriggerTxtColor
+        
+
+
+    // We only populate the table on the last bar.
+    table.cell(atrDisplay, 0, 0, "ATR 5m: " + str.tostring(atr5, ATRformatStructure), bgcolor = BGColor5, text_color = TxtColor5)
+    table.cell(atrDisplay, 1, 0, "ATR 15m: " + str.tostring(atr15, ATRformatStructure), bgcolor = BGColor15, text_color = TxtColor15)
+    table.cell(atrDisplay, 2, 0, "ATR 1H: " + str.tostring(atr1h, ATRformatStructure), bgcolor = BGColor1h, text_color = TxtColor1h)
+    
+  
+    table.cell(atrDisplay, 0, 2, "ATR 4H: " + str.tostring(atr4h, ATRformatStructure), bgcolor = BGColor4h, text_color = TxtColor4h)
+    table.cell(atrDisplay, 1, 2, "ATR 1D: " + str.tostring(atrD, ATRformatStructure), bgcolor = BGColor1D, text_color = TxtColor1D)
+    table.cell(atrDisplay, 2, 2, "ATR 1W: " + str.tostring(atrW, ATRformatStructure), bgcolor = BGColor1W, text_color = TxtColor1W)
+    
+// -------------------------------------------ZIGZAG---------------------------------------------------
+prd = input.int(defval=5, title='ZigZag Period', minval=2, maxval=100, group = "ZigZag")
+showzigzag =true //input(defval=true, title='Show Zig Zag', group = "ZigZag")
+showfibo = false //input(defval=true, title='Show Fibonacci Ratios')
+colorfulfibo = false //input(defval=false, title='Colorful Fibonacci Levels')
+labelcol = color.blue //input(defval=color.blue, title='Text Color')
+fibolinecol = color.lime //input(defval=color.lime, title='Line Color')
+upcol =color.blue //input.color(defval=color.blue, title='Zigzag Line Colors', inline='zzcol', group = "ZigZag")
+dncol =color.yellow //input.color(defval=color.yellow, title='', inline='zzcol', group = "ZigZag")
+labelloc = 'Left' //input.string(defval='Left', title='Label Location', options=['Left', 'Right'])
+enable236 = false //input(defval=true, title='Enable Level 0.236')
+enable382 = false //input(defval=true, title='Enable Level 0.382')
+enable500 = false //input(defval=true, title='Enable Level 0.500')
+enable618 = false //input(defval=true, title='Enable Level 0.618')
+enable786 = false //input(defval=true, title='Enable Level 0.786')
+
+bool newbar = ta.change(time("")) != 0
+
+bi = ta.valuewhen(newbar, bar_index, prd - 1)
+len = bar_index - bi + 1
+
+int zz_lbl_top = na
+int zz_lbl_btm = na
+
+float ph = na
+float pl = na
+ph := ta.highestbars(high, nz(len, 1)) == 0 ? high : na
+pl := ta.lowestbars(low, nz(len, 1)) == 0 ? low : na
+
+var dir = 0
+iff_1 = pl and na(ph) ? -1 : dir
+dir := ph and na(pl) ? 1 : iff_1
+var max_array_size = 50
+var zigzag = array.new_float(0)
+oldzigzag = array.copy(zigzag)
+
+add_to_zigzag(value, bindex) =>
+    array.unshift(zigzag, bindex)
+    array.unshift(zigzag, value)
+    if array.size(zigzag) > max_array_size
+        array.pop(zigzag)
+        array.pop(zigzag)
+
+update_zigzag(value, bindex) =>
+    if array.size(zigzag) == 0
+        add_to_zigzag(value, bindex)
+    else
+        if dir == 1 and value > array.get(zigzag, 0) or dir == -1 and value < array.get(zigzag, 0)
+            array.set(zigzag, 0, value)
+            array.set(zigzag, 1, bindex)
+        0.
+
+bool dirchanged = dir != dir[1]
+if ph or pl
+    if dirchanged
+        add_to_zigzag(dir == 1 ? ph : pl, bar_index)
+    else
+        update_zigzag(dir == 1 ? ph : pl, bar_index)
+
+if showzigzag and array.size(zigzag) >= 4 and array.size(oldzigzag) >= 4
+    var line zzline = na
+
+    if array.get(zigzag, 0) != array.get(oldzigzag, 0) or array.get(zigzag, 1) != array.get(oldzigzag, 1)
+        if array.get(zigzag, 2) == array.get(oldzigzag, 2) and array.get(zigzag, 3) == math.round(array.get(oldzigzag, 3))
+            line.delete(zzline)
+
+
+        int last_dir = na
+        int last_pivot = math.round(array.get(zigzag, 3))
+
+        if dir == -1 and dir[1] == 1
+            zz_lbl_top := last_pivot
+        
+        if dir == 1 and dir[1] == -1
+            zz_lbl_btm := last_pivot
+
+        zzline := line.new(x1=math.round(array.get(zigzag, 1)), y1=array.get(zigzag, 0), x2=math.round(array.get(zigzag, 3)), y2=array.get(zigzag, 2), color=dir == 1 ? upcol : dncol, width=2)
+        zzline
+
+if not showzigzag and array.size(zigzag) >= 6
+    var line zzline = na
+    line.delete(zzline)
+    zzline := line.new(x1=math.round(array.get(zigzag, 3)), y1=array.get(zigzag, 2), x2=math.round(array.get(zigzag, 5)), y2=array.get(zigzag, 4), color=dir == 1 ? upcol : dncol, width=2, style=line.style_dotted)
+    zzline
+
+var fibo_ratios = array.new_float(0)
+var fibo_colors = array.new_color(10)
+var shownlevels = 1
+if barstate.isfirst
+    array.push(fibo_ratios, 0.000)
+    if enable236
+        array.push(fibo_ratios, 0.236)
+        shownlevels += 1
+        shownlevels
+    if enable382
+        array.push(fibo_ratios, 0.382)
+        shownlevels += 1
+        shownlevels
+    if enable500
+        array.push(fibo_ratios, 0.500)
+        shownlevels += 1
+        shownlevels
+    if enable618
+        array.push(fibo_ratios, 0.618)
+        shownlevels += 1
+        shownlevels
+    if enable786
+        array.push(fibo_ratios, 0.786)
+        shownlevels += 1
+        shownlevels
+    for x = 1 to 5 by 1
+        array.push(fibo_ratios, x)
+        array.push(fibo_ratios, x + 0.272)
+        array.push(fibo_ratios, x + 0.414)
+        array.push(fibo_ratios, x + 0.618)
+
+    // set colors
+    array.set(fibo_colors, 0, color.lime)
+    array.set(fibo_colors, 1, color.silver)
+    array.set(fibo_colors, 2, color.gray)
+    array.set(fibo_colors, 3, color.red)
+    array.set(fibo_colors, 4, color.purple)
+    array.set(fibo_colors, 5, color.fuchsia)
+    array.set(fibo_colors, 6, color.olive)
+    array.set(fibo_colors, 7, color.navy)
+    array.set(fibo_colors, 8, color.teal)
+    array.set(fibo_colors, 9, color.orange)
+
+var fibolines = array.new_line(0)
+var fibolabels = array.new_label(0)
+if showfibo and array.size(zigzag) >= 6 and barstate.islast
+    if array.size(fibolines) > 0
+        for x = 0 to array.size(fibolines) - 1 by 1
+            line.delete(array.get(fibolines, x))
+            label.delete(array.get(fibolabels, x))
+
+    diff = array.get(zigzag, 4) - array.get(zigzag, 2)
+    stopit = false
+    for x = 0 to array.size(fibo_ratios) - 1 by 1
+        if stopit and x > shownlevels
+            break
+        fibo_line_col = colorfulfibo ? array.get(fibo_colors, timenow / 1000 * x % 10) : fibolinecol
+        array.unshift(fibolines, line.new(x1=math.round(array.get(zigzag, 5)), y1=array.get(zigzag, 2) + diff * array.get(fibo_ratios, x), x2=bar_index, y2=array.get(zigzag, 2) + diff * array.get(fibo_ratios, x), color=fibo_line_col, extend=extend.right))
+        label_x_loc = labelloc == 'Left' ? math.round(array.get(zigzag, 5)) - 1 : bar_index
+        txt = labelloc == 'Left' ? '' : '                  '
+        array.unshift(fibolabels, label.new(x=label_x_loc, y=array.get(zigzag, 2) + diff * array.get(fibo_ratios, x), text=txt + str.tostring(array.get(fibo_ratios, x), '#.###') + '(' + str.tostring(math.round_to_mintick(array.get(zigzag, 2) + diff * array.get(fibo_ratios, x))) + ')', textcolor=labelcol, style=label.style_none))
+        if dir == 1 and array.get(zigzag, 2) + diff * array.get(fibo_ratios, x) > array.get(zigzag, 0) or dir == -1 and array.get(zigzag, 2) + diff * array.get(fibo_ratios, x) < array.get(zigzag, 0)
+            stopit := true
+            stopit
+
+//------------------------------------------------ Strategy -----------------------------------------------------
+
+RES = "D" //input.timeframe(title = "Timeframe" , defval = "D" , group = "Multitime" , inline = "MultiTime")
+
+dt = 0.0001
+confidence=( close-(request.security(syminfo.ticker, RES , close[1] , gaps = barmerge.gaps_off , lookahead = barmerge.lookahead_on)))/(request.security(syminfo.ticker, RES, close[1] , gaps = barmerge.gaps_off , lookahead = barmerge.lookahead_on))
+
+bull=confidence > dt
+bear= confidence < dt 
+
+var label_status = 0
+
+// -------------------------------------------------ICHI-------------------------------------------------------
+conversionPeriods =9 //input.int(9, minval=1, title="Conversion Line Length", group = "Ichi" , inline = "Ichi")
+basePeriods =26 //input.int(26, minval=1, title="Base Line Length", group = "Ichi" , inline = "Ichi")
+laggingSpan2Periods =52 //input.int(52, minval=1, title="Leading Span B Length", group = "Ichi" , inline = "Ichi")
+displacement =26 //input.int(26, minval=1, title="Lagging Span", group = "Ichi" , inline = "Ichi")
+donchian(len) => math.avg(ta.lowest(len), ta.highest(len))
+conversionLine = donchian(conversionPeriods)
+baseLine = donchian(basePeriods)
+leadLine1 = math.avg(conversionLine, baseLine)
+leadLine11 = math.avg(conversionLine[26], baseLine[26])
+leadLine2 = donchian(laggingSpan2Periods)
+leadLine22=donchian(laggingSpan2Periods[26])
+plot(conversionLine, color=#2962FF, title="Conversion Line",display = display.none)
+plot(baseLine, color=#B71C1C, title="Base Line",display = display.none)
+plot(close, offset = -displacement + 1, color=#43A047, title="Lagging Span",display = display.none)
+p1 = plot(leadLine1, offset = displacement - 1, color=#A5D6A7,
+	 title="Leading Span A",display = display.none)
+p2 = plot(leadLine2, offset = displacement - 1, color=#EF9A9A,
+	 title="Leading Span B",display = display.none)
+plot(leadLine1 > leadLine2 ? leadLine1 : leadLine2, offset = displacement - 1, title = "Kumo Cloud Upper Line", display = display.none) 
+plot(leadLine1 < leadLine2 ? leadLine1 : leadLine2, offset = displacement - 1, title = "Kumo Cloud Lower Line", display = display.none) 
+fill(p1, p2, color = leadLine1 > leadLine2 ? color.rgb(67, 160, 71, 90) : color.rgb(244, 67, 54, 90))
+
+// ---------------------------------------------------Buy and Sell ichi cloud ----------------------------------------------
+buy = close > leadLine1[26] and close > leadLine2[26]
+
+sell = close < leadLine1[26] and close < leadLine2[26]
+
+// -------------------------------------------------LONG & SHORT ----------------------------------------------
+
+long=bull[1] == true and bull[2] == true and bear[3] == true
+short=bear[1] == true and bear[2] == true and bull[3] == true
+
+
+
+if  bull   
+    if label_status != 1
+        if buy
+            bool showbuy = false
+            for int i=0 to 55
+                if short[i]
+                    break
+                if long[i]
+                    showbuy := true
+            
+            if showbuy
+                strategy.entry("buy" ,strategy.long ) 
+                red_line = close + ma_f
+                // label.new(bar_index, low,str.tostring(red_line), color=color.green)
+                line.new(bar_index, low, bar_index + 20, low , extend = extend.right, color=color.green)
+                label_status := 1
+
+    else
+        label_status := label_status[1]
+
+
+else if  bear
+
+    if label_status != -1
+        if  sell 
+            bool showShort = false
+            for int i=0 to 55
+                if long[i]
+                    break
+                if short[i]
+                    showShort := true
+            
+            if showShort
+                strategy.entry("sell" ,strategy.short)
+                grenn_line = close + ma_f
+                // label.new(bar_index, low, str.tostring(grenn_line))
+                line.new(bar_index, high, bar_index + 20, high, extend = extend.right, color=color.red)
+                label_status := -1
+        
+    else
+        label_status := label_status[1]
+
+else
+    label_status := label_status[1]
